@@ -1,7 +1,7 @@
-import { Message } from "../../entity/message"
 import { getConnection } from "typeorm"
-import { parseTimestamp } from "../../util"
-import { SlackTimestamp, SlackID, SlackUUID } from "../../slack"
+
+import { Message } from "../../entity/message"
+import { SlackTimestamp, SlackID, SlackUUID, parseTimestamp } from "../../slack"
 import { SlackMessageEvent } from ".."
 
 export interface SlackMessageCreatedEvent extends SlackMessageEvent {

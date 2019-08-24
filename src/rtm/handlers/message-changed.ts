@@ -1,8 +1,8 @@
 import { getConnection } from "typeorm"
+
 import { findMessageByUUID } from "../../finders/message"
 import { MessageHistory } from "../../entity/message_history"
-import { parseTimestamp } from "../../util"
-import { SlackTimestamp, SlackUUID, SlackID } from "../../slack"
+import { parseTimestamp, SlackTimestamp, SlackUUID, SlackID } from "../../slack"
 import { SlackMessageEvent } from ".."
 
 export interface SlackMessageChangedEvent extends SlackMessageEvent {

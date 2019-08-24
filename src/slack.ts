@@ -6,3 +6,6 @@ export type SlackUUID = string
 export type SlackID = string
 
 export const token = process.env.SLACK_BOT_TOKEN
+
+/** Parses a given Slack timestamp or Unix epoch. */
+export const parseTimestamp = (timestamp: SlackTimestamp | string | number): Date => new Date(Number(timestamp) * 1000)

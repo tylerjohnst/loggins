@@ -1,8 +1,8 @@
 import { getConnection } from "typeorm"
+
 import { MessageStatus } from "../../entity/message"
-import { parseTimestamp } from "../../util"
 import { findMessageByUUID } from "../../finders/message"
-import { SlackTimestamp, SlackID, SlackUUID } from "../../slack"
+import { SlackTimestamp, SlackID, SlackUUID, parseTimestamp } from "../../slack"
 import { SlackMessageEvent } from ".."
 
 export interface SlackMessageDeletedEvent extends SlackMessageEvent {
