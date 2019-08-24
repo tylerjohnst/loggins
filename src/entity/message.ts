@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, Index } from "typeorm"
 export enum MessageStatus {
   Created,
   Edited,
-  Deleted
+  Deleted,
 }
 
 @Entity()
@@ -15,13 +15,13 @@ export class Message {
   @Index()
   uuid: string
 
-  @Column()
+  @Column({ name: "channel_uuid" })
   @Index()
-  channel_uuid: string
+  channelUUID: string
 
-  @Column()
+  @Column({ name: "user_uuid" })
   @Index()
-  user_uuid: string
+  userUUID: string
 
   @Column()
   body: string
@@ -29,15 +29,9 @@ export class Message {
   @Column()
   timestamp: Date
 
-  @Column({
-    nullable: true
-  })
+  @Column({ nullable: true })
   edited: Date
 
-  @Column({
-    type: "enum",
-    enum: MessageStatus,
-    default: MessageStatus.Created
-  })
+  @Column({ type: "enum", enum: MessageStatus, default: MessageStatus.Created })
   status: MessageStatus
 }

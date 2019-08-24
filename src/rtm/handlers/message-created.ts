@@ -17,13 +17,13 @@ export interface SlackMessageCreatedEvent extends SlackMessageEvent {
   ts: SlackTimestamp
 }
 
-export const messageCreated = async (event: SlackMessageCreatedEvent) => {
+export const messageCreated = async (event: SlackMessageCreatedEvent): Promise<void> => {
   const message = new Message()
 
   message.uuid = event.client_msg_id
   message.body = event.text
-  message.user_uuid = event.user
-  message.channel_uuid = event.channel
+  message.userUUID = event.user
+  message.channelUUID = event.channel
   message.timestamp = parseTimestamp(event.ts)
 
   await getConnection().manager.save(message)

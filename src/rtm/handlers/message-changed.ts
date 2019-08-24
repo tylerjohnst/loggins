@@ -35,7 +35,7 @@ export interface SlackMessageChangedEvent extends SlackMessageEvent {
   ts: SlackTimestamp
 }
 
-export const messageChanged = async ({ message, previous_message }: SlackMessageChangedEvent) => {
+export const messageChanged = async ({ message, previous_message }: SlackMessageChangedEvent): Promise<void> => {
   const model = await findMessageByUUID(previous_message.client_msg_id)
 
   model.body = message.text
@@ -47,7 +47,7 @@ export const messageChanged = async ({ message, previous_message }: SlackMessage
 
   history.body = previous_message.text
   history.timestamp = parseTimestamp(previous_message.ts)
-  history.message_uuid = previous_message.client_msg_id
+  history.messageUUID = previous_message.client_msg_id
 
   await getConnection().manager.save(history)
 }

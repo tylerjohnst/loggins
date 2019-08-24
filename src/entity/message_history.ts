@@ -1,14 +1,13 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index } from "typeorm"
-import { MessageStatus } from "./message"
 
 @Entity()
 export class MessageHistory {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column()
+  @Column({ name: "message_uuid" })
   @Index()
-  message_uuid: string
+  messageUUID: string
 
   @Column()
   @Index()

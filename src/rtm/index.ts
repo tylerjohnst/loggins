@@ -11,7 +11,7 @@ export interface SlackMessageEvent {
   subtype?: "message_changed" | "message_deleted"
 }
 
-rtm.on('message', (event: SlackMessageEvent) => {
+rtm.on("message", (event: SlackMessageEvent) => {
   console.log(JSON.stringify(event, null, 2))
 
   switch (event.subtype) {
@@ -27,7 +27,7 @@ rtm.on('message', (event: SlackMessageEvent) => {
   }
 })
 
-export const listenToRTM = async () => {
+export const listenToRTM = async (): Promise<void> => {
   try {
     await rtm.start()
   } catch (err) {

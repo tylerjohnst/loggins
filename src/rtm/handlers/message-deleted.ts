@@ -21,12 +21,12 @@ export interface SlackMessageDeletedEvent extends SlackMessageEvent {
       user: SlackID
       ts: SlackTimestamp
     }
-  },
+  }
   event_ts: SlackTimestamp
   ts: SlackTimestamp
 }
 
-export const messageDeleted = async (event: SlackMessageDeletedEvent) => {
+export const messageDeleted = async (event: SlackMessageDeletedEvent): Promise<void> => {
   const result = await findMessageByUUID(event.previous_message.client_msg_id)
 
   result.status = MessageStatus.Deleted

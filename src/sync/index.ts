@@ -1,14 +1,13 @@
 import { WebClient } from "@slack/web-api"
 import { token, SlackID } from "../slack"
 import { getConnection } from "typeorm"
-import { findOrBuildUserByUUID } from '../finders/user'
-import { writeFileSync } from "fs"
+import { findOrBuildUserByUUID } from "../finders/user"
 import { findOrBuildChannelByUUID } from "../finders/channel"
 
 const client = new WebClient(token)
 
 interface SlackUser {
-  id: SlackID,
+  id: SlackID
   name: string
   real_name: string
   profile: {
@@ -16,7 +15,7 @@ interface SlackUser {
   }
 }
 
-export const syncUsers = async () => {
+export const syncUsers = async (): Promise<void> => {
   let hasMore = true
   let cursor = undefined
 
@@ -54,10 +53,10 @@ interface SlackChannel {
   name: string
 }
 
-export const syncChannels = async () => {
+export const syncChannels = async (): Promise<void> => {
   const response = await client.channels.list({
     exclude_archived: true,
-    exclude_members: true
+    exclude_members: true,
   })
 
   if (response.ok) {

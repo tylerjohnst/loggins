@@ -1,7 +1,7 @@
 import { getConnection } from "typeorm"
 import { User } from "../entity/user"
 
-export const findUserByUUID = async (uuid: string) =>
+export const findUserByUUID = async (uuid: string): Promise<User> =>
   await getConnection().manager.findOne(User, { where: { uuid } })
 
 export const findOrBuildUserByUUID = async (uuid: string): Promise<User> => {
