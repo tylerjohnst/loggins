@@ -1,47 +1,22 @@
 import { getConnection } from "typeorm"
 
-import { client } from "./client"
-import { SlackID } from "../slack"
 import { findOrBuildUserByUUID } from "../finders/user"
-
-interface SlackUser {
-  id: SlackID
-  name: string
-  real_name: string
-  profile: {
-    image_72: string
-  }
-}
+import { getUsers } from "../slack/get-users"
 
 export const syncUsers = async (): Promise<void> => {
-  let hasMore = true
-  let cursor = undefined
+  const users = await getUsers()
 
-  while (hasMore) {
-    const response = await client.users.list({ cursor })
+  for (const { id, name, real_name, profile } of users) {
+    const user = await findOrBuildUserByUUID(id)
 
-    if (response.ok) {
-      const users = response.members as [SlackUser]
+    user.avatar = profile.image_72
+    user.handle = name
+    user.name = real_name
 
-      users.forEach(async ({ id, name, real_name, profile: { image_72 } }) => {
-        const user = await findOrBuildUserByUUID(id)
-
-        user.avatar = image_72
-        user.handle = name
-        user.name = real_name
-
-        try {
-          getConnection().manager.save(user)
-        } catch (err) {
-          console.error(err)
-        }
-      })
-
-      cursor = response.response_metadata.next_cursor
-      hasMore = !!cursor
-    } else {
-      hasMore = false
-      console.error(JSON.stringify(response, null, 2))
+    try {
+      getConnection().manager.save(user)
+    } catch (err) {
+      console.error(err)
     }
   }
 }

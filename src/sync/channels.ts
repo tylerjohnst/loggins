@@ -1,27 +1,14 @@
 import { getConnection } from "typeorm"
 
-import { SlackID } from "../slack"
 import { findOrBuildChannelByUUID } from "../finders/channel"
-import { client } from "./client"
-
-interface SlackChannel {
-  id: SlackID
-  name: string
-}
+import { getChannels } from "../slack/get-channels"
 
 export const syncChannels = async (): Promise<void> => {
-  const response = await client.channels.list({
-    exclude_archived: true,
-    exclude_members: true,
-  })
+  const channels = await getChannels()
 
-  if (response.ok) {
-    const channels = response.channels as [SlackChannel]
-
-    for (const { name, id } of channels) {
-      const channel = await findOrBuildChannelByUUID(id)
-      channel.name = name
-      getConnection().manager.save(channel)
-    }
+  for (const { name, id } of channels) {
+    const channel = await findOrBuildChannelByUUID(id)
+    channel.name = name
+    getConnection().manager.save(channel)
   }
 }
