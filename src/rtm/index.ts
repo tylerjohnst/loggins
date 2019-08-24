@@ -12,8 +12,6 @@ export interface SlackMessageEvent {
 }
 
 rtm.on("message", (event: SlackMessageEvent) => {
-  console.log(JSON.stringify(event, null, 2))
-
   switch (event.subtype) {
     case "message_changed":
       messageChanged(event as SlackMessageChangedEvent)
