@@ -1,8 +1,7 @@
-import { getConnection, EntityManager } from "typeorm"
-
-import { Message } from "../../entity/message"
+import { Message, MessageStatus } from "../../entity/message"
 import { SlackTimestamp, SlackID, SlackUUID, parseTimestamp } from "../../slack"
 import { SlackMessageEvent } from ".."
+import { saveEntity } from "../../commands/save-entity"
 
 export interface SlackMessageCreatedEvent extends SlackMessageEvent {
   client_msg_id: SlackUUID
@@ -18,7 +17,7 @@ export interface SlackMessageCreatedEvent extends SlackMessageEvent {
 }
 
 export class MessageCreatedHandler {
-  constructor(private event: SlackMessageCreatedEvent, private entityManager: EntityManager) {}
+  constructor(private event: SlackMessageCreatedEvent, private save: typeof saveEntity) {}
 
   async process(): Promise<void> {
     const { client_msg_id, text, user, channel, ts } = this.event
@@ -30,10 +29,11 @@ export class MessageCreatedHandler {
     model.userUUID = user
     model.channelUUID = channel
     model.timestamp = parseTimestamp(ts)
+    model.status = MessageStatus.Created
 
-    await this.entityManager.save(model)
+    await this.save(model)
   }
 }
 
 export default async (event: SlackMessageCreatedEvent): Promise<void> =>
-  new MessageCreatedHandler(event, getConnection().manager).process()
+  new MessageCreatedHandler(event, saveEntity).process()
