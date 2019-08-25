@@ -1,7 +1,7 @@
 import { getConnection } from "typeorm"
 import { Channel } from "../entity/channel"
 
-export const findChannelByUUID = async (uuid: string): Promise<Channel> =>
+export const findChannelByUUID = async (uuid: string): Promise<Channel | undefined> =>
   await getConnection().manager.findOne(Channel, { where: { uuid } })
 
 export const findOrBuildChannelByUUID = async (uuid: string): Promise<Channel> => {

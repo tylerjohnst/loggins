@@ -1,3 +1,5 @@
+import "reflect-metadata"
+
 import { createConnection } from "typeorm"
 import { listenToRTM } from "./src/rtm"
 import { syncUsers, syncChannels } from "./src/sync"
