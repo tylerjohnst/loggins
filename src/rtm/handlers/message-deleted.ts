@@ -26,7 +26,7 @@ export interface SlackMessageDeletedEvent extends SlackMessageEvent {
   // ts: SlackTimestamp
 }
 
-class MessageDeletedHandler {
+export class MessageDeletedHandler {
   constructor(
     private event: SlackMessageDeletedEvent,
     private entityManager: EntityManager,

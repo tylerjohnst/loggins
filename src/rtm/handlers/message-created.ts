@@ -17,7 +17,7 @@ export interface SlackMessageCreatedEvent extends SlackMessageEvent {
   // event_ts: SlackTimestamp
 }
 
-class MessageCreatedHandler {
+export class MessageCreatedHandler {
   constructor(private event: SlackMessageCreatedEvent, private entityManager: EntityManager) {}
 
   async process(): Promise<void> {
