@@ -43,5 +43,6 @@ it("creates the Message in the deleted state if it does not exist", async () => 
   expect(message.timestamp).toBeTruthy()
   expect(message.edited).toBeFalsy()
   expect(message.status).toEqual(MessageStatus.Deleted)
+  expect(message.body).toEqual(event.previous_message.text)
   expect(message.deleted).toBeTruthy()
 })
