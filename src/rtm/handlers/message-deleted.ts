@@ -1,9 +1,8 @@
-import { getConnection, EntityManager } from "typeorm"
-
 import { MessageStatus, Message } from "../../entity/message"
 import { findMessageByUUID } from "../../finders/message"
 import { SlackTimestamp, SlackUUID, parseTimestamp, SlackID } from "../../slack"
 import { SlackMessageEvent } from ".."
+import { saveEntity } from "../../commands/save-entity"
 
 export interface SlackMessageDeletedEvent extends SlackMessageEvent {
   deleted_ts: SlackTimestamp
@@ -29,8 +28,8 @@ export interface SlackMessageDeletedEvent extends SlackMessageEvent {
 export class MessageDeletedHandler {
   constructor(
     private event: SlackMessageDeletedEvent,
-    private entityManager: EntityManager,
     private entityLoader: typeof findMessageByUUID,
+    private entitySaver: typeof saveEntity,
   ) {}
 
   async process(): Promise<void> {
@@ -49,7 +48,7 @@ export class MessageDeletedHandler {
     model.status = MessageStatus.Deleted
     model.deleted = parseTimestamp(deleted_ts)
 
-    await this.entityManager.save(model)
+    await this.entitySaver(model)
   }
 
   private async createMessage(): Promise<void> {
@@ -79,4 +78,4 @@ export class MessageDeletedHandler {
 }
 
 export default async (event: SlackMessageDeletedEvent): Promise<void> =>
-  new MessageDeletedHandler(event, getConnection().manager, findMessageByUUID).process()
+  new MessageDeletedHandler(event, findMessageByUUID, saveEntity).process()

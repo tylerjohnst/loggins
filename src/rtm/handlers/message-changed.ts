@@ -38,12 +38,12 @@ export interface SlackMessageChangedEvent extends SlackMessageEvent {
 export class MessageChangeHandler {
   constructor(
     private event: SlackMessageChangedEvent,
-    private entitySaver: typeof saveEntity,
-    private entityLoader: typeof findMessageByUUID,
+    private load: typeof findMessageByUUID,
+    private save: typeof saveEntity,
   ) {}
 
   async process(): Promise<void> {
-    const model = await this.entityLoader(this.id)
+    const model = await this.load(this.id)
 
     if (model) {
       await this.updateMessage(model)
@@ -66,7 +66,7 @@ export class MessageChangeHandler {
     model.body = text
     model.edited = parseTimestamp(ts)
 
-    await this.entitySaver(model)
+    await this.save(model)
   }
 
   private async createMessageHistory(): Promise<void> {
@@ -80,7 +80,7 @@ export class MessageChangeHandler {
     model.timestamp = parseTimestamp(ts)
     model.messageUUID = client_msg_id
 
-    await this.entitySaver(model)
+    await this.save(model)
   }
 
   private async createMessage(): Promise<void> {
@@ -106,4 +106,4 @@ export class MessageChangeHandler {
 }
 
 export default async (event: SlackMessageChangedEvent): Promise<void> =>
-  new MessageChangeHandler(event, saveEntity, findMessageByUUID).process()
+  new MessageChangeHandler(event, findMessageByUUID, saveEntity).process()
