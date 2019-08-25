@@ -2,19 +2,13 @@ import "reflect-metadata"
 
 import { createConnection } from "typeorm"
 import { listenToRTM } from "./src/rtm"
-import { syncUsers, syncChannels } from "./src/sync"
+import { startChannelSync, startUserSync } from "./src/sync"
 
 const main = async (): Promise<void> => {
   await createConnection()
 
   try {
-    await Promise.all([syncUsers(), syncChannels()])
-  } catch (err) {
-    console.error(err)
-  }
-
-  try {
-    await listenToRTM()
+    await Promise.all([startChannelSync(), startUserSync(), listenToRTM()])
   } catch (err) {
     console.error(err)
   }

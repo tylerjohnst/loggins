@@ -1,22 +1,19 @@
-import { getConnection } from "typeorm"
-
 import { findOrBuildUserByUUID } from "../finders/user"
 import { getUsers } from "../slack/get-users"
+import { saveEntity } from "../commands/save-entity"
 
-export const syncUsers = async (): Promise<void> => {
+export const syncUsers = async (): Promise<void[]> => {
   const users = await getUsers()
 
-  for (const { id, name, real_name, profile } of users) {
-    const user = await findOrBuildUserByUUID(id)
+  return Promise.all(
+    users.map(async ({ id, name, real_name, profile }) => {
+      const user = await findOrBuildUserByUUID(id)
 
-    user.avatar = profile.image_72
-    user.handle = name
-    user.name = real_name
+      user.avatar = profile.image_72
+      user.handle = name
+      user.name = real_name
 
-    try {
-      getConnection().manager.save(user)
-    } catch (err) {
-      console.error(err)
-    }
-  }
+      await saveEntity(user).catch(console.error)
+    }),
+  )
 }

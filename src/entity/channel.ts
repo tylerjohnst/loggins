@@ -3,12 +3,12 @@ import { Entity, Column, PrimaryGeneratedColumn, Index } from "typeorm"
 @Entity()
 export class Channel {
   @PrimaryGeneratedColumn()
-  id: number
+  id!: number
 
   @Column()
   @Index()
-  uuid: string
+  uuid!: string
 
   @Column()
-  name: string
+  name!: string
 }

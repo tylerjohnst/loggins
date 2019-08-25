@@ -1,5 +1,6 @@
 import { client } from "./client"
 import { SlackID } from "../slack"
+import { WebAPICallResult } from "@slack/web-api"
 
 interface SlackUser {
   id: SlackID
@@ -16,11 +17,17 @@ export const getUsers = async (): Promise<SlackUser[]> => {
   let cursor = undefined
 
   while (hasMore) {
-    const response = await client.users.list({ cursor })
+    const response: WebAPICallResult = await client.users.list({ cursor })
 
     if (response.ok) {
       users = users.concat(response.members as SlackUser[])
-      cursor = response.response_metadata.next_cursor
+
+      if (response.response_metadata && response.response_metadata.next_cursor) {
+        cursor = response.response_metadata.next_cursor
+      } else {
+        cursor = undefined
+      }
+
       hasMore = !!cursor
     } else {
       hasMore = false
