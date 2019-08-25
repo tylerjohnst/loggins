@@ -3,16 +3,16 @@ import { Entity, Column, PrimaryGeneratedColumn, Index } from "typeorm"
 @Entity()
 export class MessageHistory {
   @PrimaryGeneratedColumn()
-  id: number
+  id!: number
 
   @Column({ name: "message_uuid" })
   @Index()
-  messageUUID: string
+  messageUUID!: string
 
   @Column()
   @Index()
-  body: string
+  body!: string
 
   @Column()
-  timestamp: Date
+  timestamp!: Date
 }

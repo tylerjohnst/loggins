@@ -1,7 +1,7 @@
 import { RTMClient } from "@slack/rtm-api"
-import { messageChanged, SlackMessageChangedEvent } from "./handlers/message-changed"
-import { messageDeleted, SlackMessageDeletedEvent } from "./handlers/message-deleted"
-import { messageCreated, SlackMessageCreatedEvent } from "./handlers/message-created"
+import messageChanged, { SlackMessageChangedEvent } from "./handlers/message-changed"
+import messageDeleted, { SlackMessageDeletedEvent } from "./handlers/message-deleted"
+import messageCreated, { SlackMessageCreatedEvent } from "./handlers/message-created"
 import { token } from "../slack"
 
 const rtm = new RTMClient(token)

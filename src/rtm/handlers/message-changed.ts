@@ -1,53 +1,109 @@
-import { getConnection } from "typeorm"
+import { getConnection, EntityManager } from "typeorm"
 
 import { findMessageByUUID } from "../../finders/message"
+import { Message, MessageStatus } from "../../entity/message"
 import { MessageHistory } from "../../entity/message_history"
 import { parseTimestamp, SlackTimestamp, SlackUUID, SlackID } from "../../slack"
 import { SlackMessageEvent } from ".."
 
 export interface SlackMessageChangedEvent extends SlackMessageEvent {
-  subtype: "message_changed"
-  hidden: boolean
+  channel: SlackID
   message: {
     client_msg_id: SlackUUID
-    type: "message"
     text: string
     user: SlackID
-    team: SlackID
     edited: {
-      user: SlackID
       ts: SlackTimestamp
+      // user: SlackID
     }
-    ts: SlackTimestamp
-    user_team: SlackID
-    source_team: SlackID
+    // type: "message"
+    // team: SlackID
+    // ts: SlackTimestamp
+    // user_team: SlackID
+    // source_team: SlackID
   }
-  channel: SlackID
   previous_message: {
     client_msg_id: SlackUUID
-    type: "message"
     text: string
-    user: SlackID
     ts: SlackTimestamp
-    team: SlackID
+    // type: "message"
+    // user: SlackID
+    // team: SlackID
   }
-  event_ts: SlackTimestamp
-  ts: SlackTimestamp
+  // subtype: "message_changed"
+  // hidden: boolean
+  // event_ts: SlackTimestamp
+  // ts: SlackTimestamp
 }
 
-export const messageChanged = async ({ message, previous_message }: SlackMessageChangedEvent): Promise<void> => {
-  const model = await findMessageByUUID(previous_message.client_msg_id)
+export class MessageChangeHandler {
+  constructor(
+    private event: SlackMessageChangedEvent,
+    private entityManager: EntityManager,
+    private entityLoader: typeof findMessageByUUID,
+  ) {}
 
-  model.body = message.text
-  model.edited = parseTimestamp(message.edited.ts)
+  async process(): Promise<void> {
+    const model = await this.entityLoader(this.id)
 
-  await getConnection().manager.save(model)
+    if (model) {
+      await this.updateMessage(model)
+      await this.createMessageHistory()
+    } else {
+      await this.createMessage()
+    }
+  }
 
-  const history = new MessageHistory()
+  private async updateMessage(model: Message): Promise<void> {
+    const {
+      message: {
+        text,
+        edited: { ts },
+      },
+    } = this.event
 
-  history.body = previous_message.text
-  history.timestamp = parseTimestamp(previous_message.ts)
-  history.messageUUID = previous_message.client_msg_id
+    model.status = MessageStatus.Edited
+    model.body = text
+    model.edited = parseTimestamp(ts)
 
-  await getConnection().manager.save(history)
+    await this.entityManager.save(model)
+  }
+
+  private async createMessageHistory(): Promise<void> {
+    const {
+      previous_message: { ts, client_msg_id, text },
+    } = this.event
+
+    const model = new MessageHistory()
+
+    model.body = text
+    model.timestamp = parseTimestamp(ts)
+    model.messageUUID = client_msg_id
+
+    await this.entityManager.save(model)
+  }
+
+  private async createMessage(): Promise<void> {
+    const {
+      channel,
+      message: { user },
+      previous_message: { ts },
+    } = this.event
+
+    const model = new Message()
+
+    model.uuid = this.id
+    model.channelUUID = channel
+    model.userUUID = user
+    model.timestamp = parseTimestamp(ts)
+
+    await this.updateMessage(model)
+  }
+
+  private get id(): SlackID {
+    return this.event.message.client_msg_id
+  }
 }
+
+export default async (event: SlackMessageChangedEvent): Promise<void> =>
+  new MessageChangeHandler(event, getConnection().manager, findMessageByUUID).process()

@@ -1,4 +1,4 @@
 import { WebClient } from "@slack/web-api"
-import { token } from "../slack"
+import { token } from "."
 
 export const client = new WebClient(token)

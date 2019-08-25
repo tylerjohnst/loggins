@@ -3,18 +3,18 @@ import { Entity, Column, PrimaryGeneratedColumn, Index } from "typeorm"
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number
+  id!: number
 
   @Column()
   @Index()
-  uuid: string
+  uuid!: string
 
   @Column()
-  name: string
+  name!: string
 
   @Column()
-  handle: string
+  handle!: string
 
   @Column()
-  avatar: string
+  avatar!: string
 }

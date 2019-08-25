@@ -9,29 +9,32 @@ export enum MessageStatus {
 @Entity()
 export class Message {
   @PrimaryGeneratedColumn()
-  id: number
+  id!: number
 
   @Column()
   @Index()
-  uuid: string
+  uuid!: string
 
   @Column({ name: "channel_uuid" })
   @Index()
-  channelUUID: string
+  channelUUID!: string
 
   @Column({ name: "user_uuid" })
   @Index()
-  userUUID: string
+  userUUID!: string
 
   @Column()
-  body: string
+  body!: string
 
   @Column()
-  timestamp: Date
+  timestamp!: Date
 
   @Column({ nullable: true })
-  edited: Date
+  edited?: Date
+
+  @Column({ nullable: true })
+  deleted?: Date
 
   @Column({ type: "enum", enum: MessageStatus, default: MessageStatus.Created })
-  status: MessageStatus
+  status!: MessageStatus
 }
